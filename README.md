@@ -6,13 +6,13 @@
 
 <p>
   <strong>Modular NixOS + Home Manager Flake</strong><br />
-  GNOME Desktop • Catppuccin Mocha & Mauve • Smart Boot &amp; GPU Profiles • Privacy by Design
+  GNOME Desktop • Catppuccin Mocha & Mauve • Smart Boot &amp; GPU Profiles
 </p>
 
 <p>
   <img src="https://img.shields.io/badge/NixOS-unstable-89b4fa?style=for-the-badge&logo=nixos&logoColor=1e1e2e&labelColor=313244" alt="NixOS Unstable" />
   <img src="https://img.shields.io/badge/Home_Manager-integrated-cba6f7?style=for-the-badge&logo=nixos&logoColor=1e1e2e&labelColor=313244" alt="Home Manager" />
-  <img src="https://img.shields.io/badge/GNOME-50_Wayland-a6e3a1?style=for-the-badge&logo=gnome&logoColor=1e1e2e&labelColor=313244" alt="GNOME Wayland" />
+  <img src="https://img.shields.io/badge/GNOME-51_Wayland-a6e3a1?style=for-the-badge&logo=gnome&logoColor=1e1e2e&labelColor=313244" alt="GNOME Wayland" />
   <img src="https://img.shields.io/badge/Theme-Catppuccin_Mocha-f5c2e7?style=for-the-badge&logo=catppuccin&logoColor=1e1e2e&labelColor=313244" alt="Catppuccin Mocha" />
   <img src="https://img.shields.io/badge/Task_Runner-just-fab387?style=for-the-badge&logo=gnu-bash&logoColor=1e1e2e&labelColor=313244" alt="just" />
 </p>
@@ -30,15 +30,44 @@
 
 ---
 
-<!-- Drop a desktop screenshot into assets/preview.png and uncomment below:
 <div align="center">
-  <img src="assets/preview.png" alt="Desktop Preview" width="90%" />
+  <img src="assets/preview.png" alt="Desktop Preview" width="100%" />
 </div>
--->
+
+<table>
+  <tr>
+    <td align="center" width="50%">
+      <img src="assets/search.png" alt="Vicinae Launcher & Clean Desktop" width="100%" /><br />
+      <sub><strong>Vicinae Launcher</strong> • <code>azclock</code></sub>
+    </td>
+    <td align="center" width="50%">
+      <img src="assets/guake.png" alt="Guake Drop-down Terminal with Starship & just" width="100%" /><br />
+      <sub><strong>Guake Drop-down</strong> • Fish, Starship &amp; <code>just</code></sub>
+    </td>
+  </tr>
+  <tr>
+    <td align="center" width="50%">
+      <img src="assets/grub.png" alt="Custom Catppuccin Mocha GRUB Bootloader" width="100%" /><br />
+      <sub><strong>GRUB Bootloader</strong> • Catppuccin Mocha Dual-Boot</sub>
+    </td>
+    <td align="center" width="50%">
+      <img src="assets/bootvine.png" alt="Bootvine Live Systemd Boot Tree" width="100%" /><br />
+      <sub><strong>Bootvine</strong> • Live systemd boot tree</sub>
+    </td>
+  </tr>
+</table>
+
+<details>
+<summary><strong>▶️ Watch Bootvine live boot animation (upstream demo)</strong></summary>
+<br />
+<div align="center">
+  <img src="https://codeberg.org/wvhulle/bootvine/raw/branch/recordings/boot.gif" alt="Bootvine Live Boot Animation" width="75%" /><br />
+  <sub>Upstream demo from <a href="https://codeberg.org/wvhulle/bootvine">wvhulle/bootvine</a></sub>
+</div>
+</details>
 
 ## ✨ Highlights
 
-- **🔒 Privacy by Design** — Zero personal data (`username`, `fullName`, `hostName`, `timeZone`) or disk UUIDs are committed to GitHub. Private values live in gitignored `local/local.nix` and are injected purely via `--override-input local path:./local` without touching `flake.lock` or using `--impure`.
 - **💿 Smart Disk & Boot Detection** — `nixos/core/boot.nix` automatically detects `/boot/efi` (shared dual-boot disk) vs. `/boot` (dedicated NixOS disk), enables `os-prober` across one or multiple drives, pairs GRUB Catppuccin Mocha with **Bootvine**, and prints the detected layout on activation.
 - **🎮 Reusable GPU Profiles** — Drop-in modules under `nixos/hardware/` for **Intel** (VA-API `iHD` + `i965`), **AMD** (`amdgpu` + Mesa/Vulkan), and **NVIDIA RTX** (open kernel module + Wayland/VA-API), selected per host with a single line (`my.hardware.gpu`).
 - **🖥️ Multi-Monitor GNOME Patches** — Custom derivations in `pkgs/` (exposed via `pkgs.custom.*`) fixing multi-monitor Desktop Clock (`azclock`), multi-panel Dynamic Music Pill with shared Cava visualizer, and cursor-aware Guake placement on GNOME Wayland.
@@ -76,7 +105,7 @@ Each top-level directory has a single clear responsibility:
 | [`pkgs/`](pkgs/) | Custom derivations & extension patches exposed under `pkgs.custom.*` |
 | [`overlays/`](overlays/) | Overlay wiring `pkgs/` into `nixpkgs` |
 | [`scripts/`](scripts/) | One-command machine bootstrapper (`new-host.sh`) |
-| [`assets/`](assets/) | Static assets (custom GRUB dual-boot logo) |
+| [`assets/`](assets/) | Static assets (desktop screenshots, custom GRUB dual-boot logo) |
 
 <details>
 <summary><strong>Click to expand full directory tree</strong></summary>
@@ -120,7 +149,12 @@ Each top-level directory has a single clear responsibility:
 ├── overlays/
 │   └── default.nix
 └── assets/
-    └── grub-logo.png
+    ├── bootvine.png
+    ├── grub-logo.png
+    ├── grub.png
+    ├── guake.png
+    ├── preview.png
+    └── search.png
 ```
 
 </details>
