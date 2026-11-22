@@ -40,6 +40,11 @@ in
     ];
 
     interactiveShellInit = ''
+      # Prevent Guake's X11 wrapper `GTK_THEME=Adwaita:dark` from leaking into child shells and GUI apps
+      if test "$GTK_THEME" = "Adwaita:dark"
+        set -e GTK_THEME
+      end
+
       # Disable default greeting
       set -g fish_greeting ""
 

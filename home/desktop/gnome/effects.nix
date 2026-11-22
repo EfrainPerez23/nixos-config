@@ -32,14 +32,23 @@
       "org/gnome/shell/extensions/blur-my-shell/applications" = {
         blur = false;
       };
+      # Disable Blur my Shell v78's popup background override so Colloid Catppuccin
+      # keeps styling Quick Settings, Calendar, Notifications, Menus, and Dialogs
+      "org/gnome/shell/extensions/blur-my-shell/popup" = {
+        blur = false;
+        override-background = false;
+        preserve-shell-theme = true;
+      };
 
-      # Rounded window corners with subtle Catppuccin Mauve border (excluding Guake)
+      # Rounded window corners with subtle Catppuccin Mauve border (excluding Guake and Vicinae)
       "org/gnome/shell/extensions/rounded-window-corners-reborn" = {
         skip-libadwaita-app = false;
         border-width = mkInt32 1;
         blacklist = [
           "guake"
           "Guake"
+          "vicinae"
+          "Vicinae"
         ];
         global-rounded-corner-settings = [
           (mkDictionaryEntry [

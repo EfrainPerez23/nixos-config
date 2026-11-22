@@ -52,11 +52,19 @@ let
     }
   ];
 
+  # Include both fallback monitor indices (0..3) and known monitor hardware IDs (vendor-serial)
+  # because Dash to Panel's `adjustMonitorSettings()` deletes numeric keys ("0", "1") at login
+  # and replaces them only with the monitors detected at that instant; if an external monitor
+  # finishes DisplayPort handshake later, it would otherwise fall back to Dash to Panel's default taskbar layout.
   dashToPanelElementPositions = builtins.toJSON {
     "0" = topBarElements;
     "1" = topBarElements;
     "2" = topBarElements;
     "3" = topBarElements;
+    "LGD-0x00000000" = topBarElements;
+    "GSM-0x00076aba" = topBarElements;
+    "SPT-0x00000000" = topBarElements;
+    "GSM-0x01010101" = topBarElements;
   };
 in
 {

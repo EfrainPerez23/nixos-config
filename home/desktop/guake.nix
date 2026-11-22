@@ -32,9 +32,12 @@ let
 in
 {
   config = lib.mkIf osConfig.my.desktop.guake.enable {
-    # Autostart Guake when the graphical session starts
-    xdg.configFile."autostart/guake.desktop".source =
-      "${pkgs.custom.guake-toggle}/share/applications/guake.desktop";
+    # Autostart Guake when the graphical session starts.
+    # Use a distinct filename from `guake.desktop` and keep `start-at-login = false`
+    # because Guake's `refresh_user_start()` tries to overwrite/remove
+    # `~/.config/autostart/guake.desktop`, which crashes with EROFS on a Home Manager symlink.
+    xdg.configFile."autostart/guake-autostart.desktop".source =
+      "${pkgs.custom.guake-toggle}/share/guake/autostart-guake.desktop";
 
     dconf.settings = with lib.hm.gvariant; {
       "org/guake/general" = {
@@ -58,7 +61,7 @@ in
         save-tabs-when-changed = true;
         schema-version = "3.10.1";
         scroll-keystroke = true;
-        start-at-login = true;
+        start-at-login = false;
         use-audible-bell = false;
         use-default-font = false;
         use-popup = true;
