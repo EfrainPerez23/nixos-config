@@ -1,0 +1,6 @@
+{
+  "uuid": "guake-helper@local",
+  "name": "Guake Monitor Helper",
+  "description": "Exposes pointer monitor geometry and reliable Guake placement over D-Bus on Wayland.",
+  "shell-version": ["46", "47", "48", "49", "50", "51"]
+}

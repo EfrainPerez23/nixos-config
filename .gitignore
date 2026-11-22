@@ -1,0 +1,20 @@
+# Private per-machine personal and regional settings (never commit to GitHub)
+/local/local.nix
+
+# direnv / nix-direnv cache and local overrides
+.direnv/
+.envrc.local
+
+# Temporary nix build / nixos-rebuild outputs
+result
+result-*
+
+# Backup files (including Home Manager backups)
+*.bak
+*.backup
+*.orig
+*~
+
+# Editor / OS artifacts
+.DS_Store
+*.swp

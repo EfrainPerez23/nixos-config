@@ -1,0 +1,72 @@
+# Fish shell: `nh` maintenance aliases, Catppuccin Mocha colors, and plugins
+
+{
+  pkgs,
+  osConfig,
+  hostProfile,
+  ...
+}:
+
+let
+  flakeDir = osConfig.my.user.flakeDir;
+in
+{
+  programs.fish = {
+    enable = true;
+
+    shellAliases = {
+      nrs = "nh os switch ${flakeDir} -H ${hostProfile} -- --override-input local path:${flakeDir}/local";
+      nclean = "nh clean all --keep 3";
+      ls = "eza --icons --group-directories-first";
+      ll = "eza -la --icons --group-directories-first --git";
+      lt = "eza --tree --level=2 --icons --group-directories-first";
+      cat = "bat --paging=never";
+      ff = "fastfetch";
+    };
+
+    plugins = [
+      {
+        name = "autopair";
+        src = pkgs.fishPlugins.autopair.src;
+      }
+      {
+        name = "done";
+        src = pkgs.fishPlugins.done.src;
+      }
+      {
+        name = "z";
+        src = pkgs.fishPlugins.z.src;
+      }
+    ];
+
+    interactiveShellInit = ''
+      # Disable default greeting
+      set -g fish_greeting ""
+
+      # Catppuccin Mocha color palette for Fish
+      set -g fish_color_normal cdd6f4
+      set -g fish_color_command 89b4fa
+      set -g fish_color_param f2cdcd
+      set -g fish_color_keyword f38ba8
+      set -g fish_color_quote a6e3a1
+      set -g fish_color_redirection f5c2e7
+      set -g fish_color_end fab387
+      set -g fish_color_comment 7f849c
+      set -g fish_color_error f38ba8
+      set -g fish_color_gray 6c7086
+      set -g fish_color_selection --background=313244
+      set -g fish_color_search_match --background=313244
+      set -g fish_color_operator f5c2e7
+      set -g fish_color_escape eba0ac
+      set -g fish_color_autosuggestion 6c7086
+      set -g fish_color_cancel f38ba8
+      set -g fish_color_cwd f9e2af
+      set -g fish_color_user 94e2d5
+      set -g fish_color_host 89b4fa
+      set -g fish_pager_color_progress 6c7086
+      set -g fish_pager_color_prefix f5c2e7
+      set -g fish_pager_color_completion cdd6f4
+      set -g fish_pager_color_description 6c7086
+    '';
+  };
+}
