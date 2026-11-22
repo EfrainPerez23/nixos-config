@@ -57,14 +57,10 @@
   </tr>
 </table>
 
-<details>
-<summary><strong>▶️ Watch Bootvine live boot animation (upstream demo)</strong></summary>
-<br />
 <div align="center">
   <img src="https://codeberg.org/wvhulle/bootvine/raw/branch/recordings/boot.gif" alt="Bootvine Live Boot Animation" width="75%" /><br />
-  <sub>Upstream demo from <a href="https://codeberg.org/wvhulle/bootvine">wvhulle/bootvine</a></sub>
+  <sub><strong>Bootvine Live Boot Animation</strong> • Upstream demo from <a href="https://codeberg.org/wvhulle/bootvine">wvhulle/bootvine</a></sub>
 </div>
-</details>
 
 ## ✨ Highlights
 
