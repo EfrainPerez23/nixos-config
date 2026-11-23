@@ -18,11 +18,16 @@ jobs:
   lint:
     name: Format, Lint & Privacy
     runs-on: ubuntu-latest
+    outputs:
+      privacy: ${{ steps.privacy.outcome }}
+      fmt: ${{ steps.fmt.outcome }}
+      linters: ${{ steps.linters.outcome }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v7
 
       - name: Privacy guard (ensure local/local.nix is never tracked)
+        id: privacy
         run: |
           if git ls-files --error-unmatch local/local.nix >/dev/null 2>&1; then
             echo "::error::Private file local/local.nix is tracked by Git! Remove it before merging."
@@ -39,9 +44,11 @@ jobs:
           use-flakehub: false
 
       - name: Check Nix formatting (RFC-166)
+        id: fmt
         run: nix fmt -- --fail-on-change --tree-root .
 
       - name: Run Nix and Shell linters (statix, deadnix, shellcheck)
+        id: linters
         run: |
           nix develop --command sh -c '
             statix check . &&
@@ -52,6 +59,9 @@ jobs:
   eval:
     name: Evaluate NixOS & Home Manager
     runs-on: ubuntu-latest
+    outputs:
+      flake_checkup: ${{ steps.capture-checkup.outputs.content }}
+      hosts: ${{ steps.eval-hosts.outputs.list }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v7
@@ -69,17 +79,42 @@ jobs:
         with:
           fail-mode: false
 
-      - name: Evaluate all nixosConfigurations
+      - name: Capture Flake checkup summary
+        id: capture-checkup
+        if: always()
         run: |
+          if [ -s "$GITHUB_STEP_SUMMARY" ]; then
+            {
+              echo "content<<EOF_FLAKE_CHECKUP"
+              cat "$GITHUB_STEP_SUMMARY"
+              echo ""
+              echo "EOF_FLAKE_CHECKUP"
+            } >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Evaluate all nixosConfigurations
+        id: eval-hosts
+        run: |
+          list=""
           for host in $(nix eval --json .#nixosConfigurations --apply builtins.attrNames | jq -r '.[]'); do
             echo "Evaluating nixosConfigurations.$host..."
-            nix eval --raw ".#nixosConfigurations.$host.config.system.build.toplevel.drvPath"
-            echo ""
+            start=$SECONDS
+            drv=$(nix eval --raw ".#nixosConfigurations.$host.config.system.build.toplevel.drvPath")
+            elapsed=$((SECONDS - start))
+            echo "$drv"
+            list="${list}- ✅ \`${host}\` (${elapsed}s)\n"
           done
+          {
+            echo "list<<EOF_HOSTS"
+            printf '%b' "$list"
+            echo "EOF_HOSTS"
+          } >> "$GITHUB_OUTPUT"
 
   build-pkgs:
     name: Build Custom Packages & Patches
     runs-on: ubuntu-latest
+    outputs:
+      pkgs: ${{ steps.build-all.outputs.list }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v7
@@ -93,8 +128,174 @@ jobs:
           use-flakehub: false
 
       - name: Build all custom packages
+        id: build-all
         run: |
+          list=""
           for pkg in $(nix eval --json .#packages.x86_64-linux --apply builtins.attrNames | jq -r '.[]'); do
             echo "Building packages.x86_64-linux.$pkg..."
+            start=$SECONDS
             nix build --no-link --print-build-logs ".#packages.x86_64-linux.$pkg"
+            elapsed=$((SECONDS - start))
+            list="${list}- ✅ \`${pkg}\` (${elapsed}s)\n"
           done
+          {
+            echo "list<<EOF_PKGS"
+            printf '%b' "$list"
+            echo "EOF_PKGS"
+          } >> "$GITHUB_OUTPUT"
+
+  pr-summary:
+    name: Post PR Summary
+    runs-on: ubuntu-latest
+    needs: [lint, eval, build-pkgs]
+    if: always() && github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository
+    permissions:
+      actions: read
+      pull-requests: write
+    steps:
+      - name: Post or update PR summary comment
+        uses: actions/github-script@v9
+        env:
+          LINT_RESULT: ${{ needs.lint.result }}
+          EVAL_RESULT: ${{ needs.eval.result }}
+          BUILD_RESULT: ${{ needs.build-pkgs.result }}
+          LINT_PRIVACY: ${{ needs.lint.outputs.privacy }}
+          LINT_FMT: ${{ needs.lint.outputs.fmt }}
+          LINT_LINTERS: ${{ needs.lint.outputs.linters }}
+          FLAKE_CHECKUP: ${{ needs.eval.outputs.flake_checkup }}
+          EVAL_HOSTS: ${{ needs.eval.outputs.hosts }}
+          BUILT_PKGS: ${{ needs.build-pkgs.outputs.pkgs }}
+        with:
+          script: |
+            const marker = '<!-- nixos-ci-summary -->';
+            const badge = (status) => ({
+              success: '✅ Passed',
+              failure: '❌ Failed',
+              cancelled: '⚪ Cancelled',
+              skipped: '⏭️ Skipped',
+            }[status] || `ℹ️ ${status || 'Unknown'}`);
+
+            const formatDuration = (startedAt, completedAt) => {
+              if (!startedAt || !completedAt) return '—';
+              const secs = Math.max(0, Math.round((new Date(completedAt) - new Date(startedAt)) / 1000));
+              const m = Math.floor(secs / 60);
+              const s = secs % 60;
+              return m > 0 ? `${m}m ${s}s` : `${s}s`;
+            };
+
+            const { data: jobsData } = await github.rest.actions.listJobsForWorkflowRun({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              run_id: context.runId,
+            });
+            const jobByName = Object.fromEntries(jobsData.jobs.map((j) => [j.name, j]));
+
+            const rows = [
+              ['Format, Lint & Privacy', process.env.LINT_RESULT],
+              ['Evaluate NixOS & Home Manager', process.env.EVAL_RESULT],
+              ['Build Custom Packages & Patches', process.env.BUILD_RESULT],
+            ].map(([name, result]) => {
+              const job = jobByName[name];
+              const dur = job ? formatDuration(job.started_at, job.completed_at) : '—';
+              return `| **${name}** | ${badge(result)} | \`${dur}\` |`;
+            });
+
+            const runUrl = `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
+            const lintDetails = [
+              `- Privacy guard (\`local/local.nix\`): ${badge(process.env.LINT_PRIVACY)}`,
+              `- Nix formatting (\`nix fmt\`): ${badge(process.env.LINT_FMT)}`,
+              `- Linters (\`statix\`, \`deadnix\`, \`shellcheck\`): ${badge(process.env.LINT_LINTERS)}`,
+            ].join('\n');
+
+            const sections = [
+              marker,
+              '## ❄️ NixOS CI Summary',
+              '',
+              '| Job | Status | Duration |',
+              '| :--- | :---: | :---: |',
+              ...rows,
+              '',
+            ];
+
+            const flakeCheckup = (process.env.FLAKE_CHECKUP || '').trim();
+            if (flakeCheckup) {
+              sections.push(
+                '<details open>',
+                '<summary><strong>🔍 Flake checkup</strong></summary>',
+                '',
+                flakeCheckup,
+                '',
+                '</details>',
+                ''
+              );
+            }
+
+            sections.push(
+              '<details>',
+              '<summary><strong>🧹 Format, Lint & Privacy details</strong></summary>',
+              '',
+              lintDetails,
+              '',
+              '</details>',
+              ''
+            );
+
+            const evalHosts = (process.env.EVAL_HOSTS || '').trim();
+            if (evalHosts) {
+              sections.push(
+                '<details>',
+                '<summary><strong>🖥️ Evaluated NixOS configurations</strong></summary>',
+                '',
+                evalHosts,
+                '',
+                '</details>',
+                ''
+              );
+            }
+
+            const builtPkgs = (process.env.BUILT_PKGS || '').trim();
+            if (builtPkgs) {
+              sections.push(
+                '<details>',
+                '<summary><strong>📦 Built custom packages & patches</strong></summary>',
+                '',
+                builtPkgs,
+                '',
+                '</details>',
+                ''
+              );
+            }
+
+            sections.push(`🔗 [View full Actions summary & Build timeline](${runUrl})`);
+            const body = sections.join('\n');
+
+            try {
+              const { data: comments } = await github.rest.issues.listComments({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                per_page: 100,
+              });
+              const existing = comments.find((c) => c.body && c.body.includes(marker));
+              if (existing) {
+                await github.rest.issues.updateComment({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  comment_id: existing.id,
+                  body,
+                });
+              } else {
+                await github.rest.issues.createComment({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: context.issue.number,
+                  body,
+                });
+              }
+            } catch (err) {
+              if (err.status === 403) {
+                core.info('Skipping PR comment: token is read-only (e.g. Dependabot or fork PR).');
+              } else {
+                throw err;
+              }
+            }
