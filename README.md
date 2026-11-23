@@ -15,6 +15,9 @@
   <img src="https://img.shields.io/badge/GNOME-51_Wayland-a6e3a1?style=for-the-badge&logo=gnome&logoColor=1e1e2e&labelColor=313244" alt="GNOME Wayland" />
   <img src="https://img.shields.io/badge/Theme-Catppuccin_Mocha-f5c2e7?style=for-the-badge&logo=catppuccin&logoColor=1e1e2e&labelColor=313244" alt="Catppuccin Mocha" />
   <img src="https://img.shields.io/badge/Task_Runner-just-fab387?style=for-the-badge&logo=gnu-bash&logoColor=1e1e2e&labelColor=313244" alt="just" />
+  <a href="https://github.com/<your-username>/<your-repo>/actions/workflows/ci.yml">
+    <img src="https://img.shields.io/github/actions/workflow/status/<your-username>/<your-repo>/ci.yml?branch=main&style=for-the-badge&logo=githubactions&logoColor=1e1e2e&label=CI&labelColor=313244&color=a6e3a1" alt="CI Status" />
+  </a>
 </p>
 
 <p>
@@ -211,13 +214,18 @@ Run `just` in the repository root to view all commands:
 | `just dev` | Enter the Nix development shell |
 | `just new-host <name>` | Provision a new machine profile automatically |
 
-### Development Environment (`devShell` + `direnv`)
+### Development Environment (`devShell` + `direnv`) & CI
 
 ```bash
 direnv allow   # Auto-loads the devShell on directory entry
 just fmt       # Format all Nix files
-just lint      # Run statix + deadnix checks
+just lint      # Run statix + deadnix + shellcheck
 ```
+
+GitHub Actions & automation under [`.github/`](.github/):
+- **[`workflows/ci.yml`](.github/workflows/ci.yml)** *(on pushes to `main`, Pull Requests & manual dispatch)* — runs privacy guard (`local/local.nix` never tracked), `nix fmt --fail-on-change`, `statix`, `deadnix`, `shellcheck`, evaluates all `nixosConfigurations`, and builds all custom packages/patches in `pkgs/`.
+- **[`workflows/update-flake-lock.yml`](.github/workflows/update-flake-lock.yml)** *(weekly on Mondays & manual dispatch)* — opens an automated PR updating `flake.lock`.
+- **[`dependabot.yml`](.github/dependabot.yml)** *(weekly on Mondays)* — groups and updates GitHub Actions versions automatically.
 
 ---
 

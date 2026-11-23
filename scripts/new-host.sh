@@ -222,7 +222,7 @@ echo "✅ Created hosts/$HOST_PROFILE/default.nix (no personal data)."
 
 # 7) Register the host profile in flake.nix if not already present
 FLAKE_FILE="$REPO_DIR/flake.nix"
-if grep -qE "^[[:space:]]*$HOST_PROFILE[[:space:]]*=" "$FLAKE_FILE"; then
+if grep -qE "^[[:space:]]*${HOST_PROFILE}[[:space:]]*=" "$FLAKE_FILE"; then
   echo "ℹ️  '$HOST_PROFILE' is already registered in flake.nix."
 elif grep -q "# <new-hosts>" "$FLAKE_FILE"; then
   sed -i "s|# <new-hosts>|$HOST_PROFILE = mkHost \"$HOST_PROFILE\" ./hosts/$HOST_PROFILE;\n        # <new-hosts>|" "$FLAKE_FILE"
