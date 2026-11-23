@@ -13,7 +13,6 @@ concurrency:
 
 permissions:
   contents: read
-  id-token: write
 
 jobs:
   lint:
@@ -36,6 +35,8 @@ jobs:
 
       - name: Enable Magic Nix Cache
         uses: DeterminateSystems/magic-nix-cache-action@main
+        with:
+          use-flakehub: false
 
       - name: Check Nix formatting (RFC-166)
         run: nix fmt -- --fail-on-change --tree-root .
@@ -60,6 +61,8 @@ jobs:
 
       - name: Enable Magic Nix Cache
         uses: DeterminateSystems/magic-nix-cache-action@main
+        with:
+          use-flakehub: false
 
       - name: Audit flake.lock health
         uses: DeterminateSystems/flake-checker-action@main
@@ -86,6 +89,8 @@ jobs:
 
       - name: Enable Magic Nix Cache
         uses: DeterminateSystems/magic-nix-cache-action@main
+        with:
+          use-flakehub: false
 
       - name: Build all custom packages
         run: |
