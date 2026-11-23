@@ -1,0 +1,25 @@
+version: 2
+updates:
+  # Keep GitHub Actions workflows up to date with a single grouped weekly PR
+  # (Nix flake inputs are updated separately by .github/workflows/update-flake-lock.yml)
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "06:00"
+      timezone: "UTC"
+    open-pull-requests-limit: 1
+    commit-message:
+      prefix: "chore(ci)"
+    labels:
+      - "dependencies"
+      - "ci"
+    groups:
+      github-actions:
+        patterns:
+          - "*"
+        update-types:
+          - "major"
+          - "minor"
+          - "patch"

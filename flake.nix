@@ -84,9 +84,10 @@
           nil # Nix Language Server (LSP) for IDE completions and diagnostics
           statix # Nix linter for best practices
           deadnix # Detects unused Nix bindings and imports
+          shellcheck # Shell script linter (used on scripts/new-host.sh)
         ];
         shellHook = ''
-          echo "❄️  NixOS Dev shell ready (just, nixfmt, nil, statix, deadnix)"
+          echo "❄️  NixOS Dev shell ready (just, nixfmt, nil, statix, deadnix, shellcheck)"
         '';
       };
 

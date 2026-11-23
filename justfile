@@ -57,9 +57,9 @@ clean:
 fmt:
     {{ nix_env }} nix fmt -- --tree-root "{{ justfile_directory() }}"
 
-# Audit Nix code with statix and deadnix
+# Audit Nix and shell code with statix, deadnix, and shellcheck
 lint:
-    {{ nix_env }} nix develop --command sh -c 'statix check . && deadnix --fail --exclude hosts/*/hardware-configuration.nix .'
+    {{ nix_env }} nix develop --command sh -c 'statix check . && deadnix --fail --exclude hosts/*/hardware-configuration.nix . && shellcheck scripts/new-host.sh'
 
 # Enter the Nix development shell (just, nixfmt, nil, statix, deadnix)
 dev:

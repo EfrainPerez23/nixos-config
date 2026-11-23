@@ -1,0 +1,95 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  lint:
+    name: Format, Lint & Privacy
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Privacy guard (ensure local/local.nix is never tracked)
+        run: |
+          if git ls-files --error-unmatch local/local.nix >/dev/null 2>&1; then
+            echo "::error::Private file local/local.nix is tracked by Git! Remove it before merging."
+            exit 1
+          fi
+          echo "OK: local/local.nix is not tracked."
+
+      - name: Install Nix
+        uses: DeterminateSystems/nix-installer-action@main
+
+      - name: Enable Magic Nix Cache
+        uses: DeterminateSystems/magic-nix-cache-action@main
+
+      - name: Check Nix formatting (RFC-166)
+        run: nix fmt -- --fail-on-change --tree-root .
+
+      - name: Run Nix and Shell linters (statix, deadnix, shellcheck)
+        run: |
+          nix develop --command sh -c '
+            statix check . &&
+            deadnix --fail --exclude hosts/*/hardware-configuration.nix . &&
+            shellcheck scripts/new-host.sh
+          '
+
+  eval:
+    name: Evaluate NixOS & Home Manager
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Nix
+        uses: DeterminateSystems/nix-installer-action@main
+
+      - name: Enable Magic Nix Cache
+        uses: DeterminateSystems/magic-nix-cache-action@main
+
+      - name: Audit flake.lock health
+        uses: DeterminateSystems/flake-checker-action@main
+        with:
+          fail-mode: false
+
+      - name: Evaluate all nixosConfigurations
+        run: |
+          for host in $(nix eval --json .#nixosConfigurations --apply builtins.attrNames | jq -r '.[]'); do
+            echo "Evaluating nixosConfigurations.$host..."
+            nix eval --raw ".#nixosConfigurations.$host.config.system.build.toplevel.drvPath"
+            echo ""
+          done
+
+  build-pkgs:
+    name: Build Custom Packages & Patches
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Nix
+        uses: DeterminateSystems/nix-installer-action@main
+
+      - name: Enable Magic Nix Cache
+        uses: DeterminateSystems/magic-nix-cache-action@main
+
+      - name: Build all custom packages
+        run: |
+          for pkg in $(nix eval --json .#packages.x86_64-linux --apply builtins.attrNames | jq -r '.[]'); do
+            echo "Building packages.x86_64-linux.$pkg..."
+            nix build --no-link --print-build-logs ".#packages.x86_64-linux.$pkg"
+          done
