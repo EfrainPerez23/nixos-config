@@ -8,4 +8,5 @@
   dynamic-music-pill = pkgs.callPackage ./dynamic-music-pill { };
   guake-helper = pkgs.callPackage ./guake-helper { };
   guake-toggle = pkgs.callPackage ./guake-toggle { };
+  quick-settings-audio-panel = pkgs.callPackage ./quick-settings-audio-panel { };
 }

@@ -80,6 +80,17 @@ in
         show-hide = "disabled";
       };
 
+      # Local terminal shortcuts: Ctrl++ vertical split, Ctrl+- horizontal split, Ctrl+D close pane
+      "org/guake/keybindings/local" = {
+        split-tab-vertical = "<Control>plus";
+        split-tab-horizontal = "<Control>minus";
+        close-terminal = "<Control>d";
+        # Free Ctrl++ / Ctrl+= / Ctrl+- from zoom so splits work cleanly
+        zoom-in = "";
+        zoom-in-alt = "";
+        zoom-out = "";
+      };
+
       "org/guake/style" = {
         cursor-blink-mode = mkInt32 1;
         cursor-shape = mkInt32 1;

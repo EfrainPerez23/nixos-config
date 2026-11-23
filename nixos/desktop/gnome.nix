@@ -64,13 +64,13 @@ in
         gnomeExtensions.burn-my-windows
         gnomeExtensions.coverflow-alt-tab
         gnomeExtensions.vitals
-        gnomeExtensions.quick-settings-audio-panel
         gnomeExtensions.compiz-alike-magic-lamp-effect
         gnomeExtensions.just-perfection
 
         # Custom patched extensions (via `pkgs.custom` overlay)
         custom.azclock-multimonitor
         custom.dynamic-music-pill
+        custom.quick-settings-audio-panel
       ])
       ++ lib.optionals cfg.guake.enable [
         pkgs.custom.guake-toggle
