@@ -15,8 +15,8 @@
   <img src="https://img.shields.io/badge/GNOME-51_Wayland-a6e3a1?style=for-the-badge&logo=gnome&logoColor=1e1e2e&labelColor=313244" alt="GNOME Wayland" />
   <img src="https://img.shields.io/badge/Theme-Catppuccin_Mocha-f5c2e7?style=for-the-badge&logo=catppuccin&logoColor=1e1e2e&labelColor=313244" alt="Catppuccin Mocha" />
   <img src="https://img.shields.io/badge/Task_Runner-just-fab387?style=for-the-badge&logo=gnu-bash&logoColor=1e1e2e&labelColor=313244" alt="just" />
-  <a href="https://github.com/<your-username>/<your-repo>/actions/workflows/ci.yml">
-    <img src="https://img.shields.io/github/actions/workflow/status/<your-username>/<your-repo>/ci.yml?branch=main&style=for-the-badge&logo=githubactions&logoColor=1e1e2e&label=CI&labelColor=313244&color=a6e3a1" alt="CI Status" />
+  <a href="https://github.com/EfrainPerez23/nixos-config/actions/workflows/ci.yml">
+    <img src="https://img.shields.io/github/actions/workflow/status/EfrainPerez23/nixos-config/ci.yml?branch=main&style=for-the-badge&logo=githubactions&logoColor=cdd6f4&label=CI&labelColor=313244" alt="CI Status" />
   </a>
 </p>
 
@@ -167,7 +167,7 @@ Each top-level directory has a single clear responsibility:
 Clone the repo and run the provisioning script with any generic profile name (e.g. `pc-rtx`, `desktop-amd`, `work-laptop`):
 
 ```bash
-git clone https://github.com/<your-username>/<your-repo>.git ~/Projects/nixos-config
+git clone https://github.com/EfrainPerez23/nixos-config.git ~/Projects/nixos-config
 cd ~/Projects/nixos-config
 
 # Auto-detects GPU & disks, creates private local/local.nix, registers host, and applies first switch
