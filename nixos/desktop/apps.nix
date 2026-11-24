@@ -43,5 +43,35 @@ in
         pkgs.antigravity-ide.fhs
       ];
     })
+
+    (lib.mkIf cfg.docker.enable {
+      virtualisation = {
+        docker = {
+          enable = true;
+          autoPrune = {
+            enable = true;
+            dates = "weekly";
+          };
+        };
+
+        podman = {
+          enable = true;
+          dockerCompat = false;
+          dockerSocket.enable = false;
+          defaultNetwork.settings.dns_enabled = true;
+        };
+      };
+
+      users.users.${config.my.user.name}.extraGroups = [
+        "docker"
+        "podman"
+      ];
+
+      environment.systemPackages = [
+        pkgs.docker-compose
+        pkgs.kubectl
+        pkgs.podman-desktop
+      ];
+    })
   ];
 }

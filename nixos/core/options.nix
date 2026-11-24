@@ -120,6 +120,7 @@ in
     apps = {
       browsers.enable = mkEnableOption "Google Chrome (Wayland/VA-API) and Firefox";
       antigravity.enable = mkEnableOption "Antigravity IDE (FHS) and Antigravity CLI";
+      docker.enable = mkEnableOption "Docker Engine, Podman, Compose, kubectl, and Podman Desktop GUI";
     };
   };
 }
