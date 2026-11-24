@@ -8,17 +8,7 @@
 }:
 
 let
-  colloidCatppuccinTheme = pkgs.colloid-gtk-theme.override {
-    themeVariants = [ "purple" ];
-    colorVariants = [ "dark" ];
-    tweaks = [
-      "catppuccin"
-      "rimless"
-      "float"
-      "normal"
-    ];
-  };
-  themeDir = "${colloidCatppuccinTheme}/share/themes/Colloid-Purple-Dark-Catppuccin";
+  themeDir = "${pkgs.custom.colloid-catppuccin-theme}/share/themes/Colloid-Purple-Dark-Catppuccin";
 in
 {
   config = lib.mkIf osConfig.my.desktop.gnome.enable {
