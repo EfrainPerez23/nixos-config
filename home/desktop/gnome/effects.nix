@@ -39,6 +39,11 @@
         override-background = false;
         preserve-shell-theme = true;
       };
+      # Disable Blur my Shell's Coverflow Alt-Tab background blur to avoid
+      # layering extra background actors on top of Coverflow's own backdrop
+      "org/gnome/shell/extensions/blur-my-shell/coverflow-alt-tab" = {
+        blur = false;
+      };
 
       # Rounded window corners with subtle Catppuccin Mauve border (excluding Guake and Vicinae)
       "org/gnome/shell/extensions/rounded-window-corners-reborn" = {
@@ -132,9 +137,10 @@
         duration = 320.0;
       };
 
-      # Just Perfection: snappy animations (0.8x) and shell polish
+      # Just Perfection: snappy animations (0.8x), top-right notifications, and shell polish
       "org/gnome/shell/extensions/just-perfection" = {
         animation = mkInt32 5;
+        notification-banner-position = mkInt32 2; # Top right (0:TL, 1:TC, 2:TR, 3:BL, 4:BC, 5:BR)
         workspace-wrap-around = true;
         window-demands-attention-focus = true;
       };

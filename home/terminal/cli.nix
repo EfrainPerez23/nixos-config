@@ -32,6 +32,9 @@ in
     nil
     statix
     deadnix
+
+    # Python development tooling
+    uv
   ];
 
   programs = {

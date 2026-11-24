@@ -11,18 +11,6 @@
 let
   cfg = config.my.desktop;
 
-  # Catppuccin Mocha Purple GTK + GNOME Shell theme (floating panel, rimless)
-  colloidCatppuccinTheme = pkgs.colloid-gtk-theme.override {
-    themeVariants = [ "purple" ];
-    colorVariants = [ "dark" ];
-    tweaks = [
-      "catppuccin"
-      "rimless"
-      "float"
-      "normal"
-    ];
-  };
-
   # Papirus Dark icons with Catppuccin Mocha Mauve folders
   papirusCatppuccinIcons = pkgs.catppuccin-papirus-folders.override {
     flavor = "mocha";
@@ -45,7 +33,7 @@ in
     environment.systemPackages =
       (with pkgs; [
         # Themes, icons, and cursors
-        colloidCatppuccinTheme
+        custom.colloid-catppuccin-theme
         papirusCatppuccinIcons
         catppuccin-cursors.mochaMauve
         gnome-themes-extra
@@ -59,18 +47,18 @@ in
         gnomeExtensions.dash-to-panel
         gnomeExtensions.user-themes
         gnomeExtensions.blur-my-shell
-        gnomeExtensions.rounded-window-corners-reborn
         gnomeExtensions.space-bar
         gnomeExtensions.burn-my-windows
-        gnomeExtensions.coverflow-alt-tab
         gnomeExtensions.vitals
         gnomeExtensions.compiz-alike-magic-lamp-effect
         gnomeExtensions.just-perfection
 
         # Custom patched extensions (via `pkgs.custom` overlay)
         custom.azclock-multimonitor
+        custom.coverflow-alt-tab
         custom.dynamic-music-pill
         custom.quick-settings-audio-panel
+        custom.rounded-window-corners
       ])
       ++ lib.optionals cfg.guake.enable [
         pkgs.custom.guake-toggle
