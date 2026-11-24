@@ -28,6 +28,7 @@ in
 
     # Nix development tooling (available to both terminal and IDE)
     just
+    gnumake
     nixfmt
     nil
     statix
