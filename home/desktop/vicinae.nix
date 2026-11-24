@@ -35,5 +35,12 @@
         run ${pkgs.coreutils}/bin/install -m 644 "${./vicinae.json}" "$target"
       fi
     '';
+
+    # Restart Vicinae after every switch so newly installed NixOS apps are re-indexed
+    home.activation.vicinaeRefresh = lib.hm.dag.entryAfter [ "reloadSystemd" ] ''
+      if [ -z "''${DRY_RUN:-}" ]; then
+        ${pkgs.systemd}/bin/systemctl --user try-restart vicinae.service || true
+      fi
+    '';
   };
 }
