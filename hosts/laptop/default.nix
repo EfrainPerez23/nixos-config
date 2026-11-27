@@ -23,6 +23,7 @@
       browsers.enable = true;
       antigravity.enable = true;
       docker.enable = true;
+      localsend.enable = true;
     };
   };
 
