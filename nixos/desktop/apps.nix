@@ -73,5 +73,12 @@ in
         pkgs.podman-desktop
       ];
     })
+
+    (lib.mkIf cfg.localsend.enable {
+      programs.localsend = {
+        enable = true;
+        openFirewall = true;
+      };
+    })
   ];
 }
