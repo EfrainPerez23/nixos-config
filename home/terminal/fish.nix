@@ -34,6 +34,10 @@ in
         src = pkgs.fishPlugins.done.src;
       }
       {
+        name = "nvm";
+        src = pkgs.fishPlugins.nvm.src;
+      }
+      {
         name = "z";
         src = pkgs.fishPlugins.z.src;
       }
