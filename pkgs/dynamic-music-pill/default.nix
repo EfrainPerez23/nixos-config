@@ -7,7 +7,12 @@
 gnomeExtensions.dynamic-music-pill.overrideAttrs (old: {
   postInstall = (old.postInstall or "") + ''
     extDir="$out/share/gnome-shell/extensions/dynamic-music-pill@andbal"
-    ${python3}/bin/python3 ${./patch-dmp.py} "$extDir/src/controller.js" "$extDir/src/uiMusicPill.js" "$extDir/src/uiExpandedPlayer.js"
+    ${python3}/bin/python3 ${./patch-dmp.py} \
+      "$extDir/src/controller.js" \
+      "$extDir/src/uiMusicPill.js" \
+      "$extDir/src/uiExpandedPlayer.js" \
+      "$extDir/src/visualizerEngine.js" \
+      "$extDir/src/utils.js"
     cp ${./extension.js} "$extDir/extension.js"
   '';
 })
