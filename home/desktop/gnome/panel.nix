@@ -158,9 +158,13 @@ in
         visualizer-bar-width = mkInt32 2;
         visualizer-height = mkInt32 16;
         popup-show-visualizer = true;
+        popup-hide-pill-visualizer = true;
         action-hover = "toggle_menu";
-        hover-delay = mkInt32 250;
+        hover-delay = mkInt32 80;
         popup-hide-on-leave = true;
+        freeze-scroll-on-pause = true;
+        enable-blur-pill = false;
+        enable-blur-popup = false;
         use-custom-colors = true;
         custom-bg-color = "30,30,46";
         custom-text-color = "205,214,244";

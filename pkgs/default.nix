@@ -12,4 +12,6 @@
   guake-toggle = pkgs.callPackage ./guake-toggle { };
   quick-settings-audio-panel = pkgs.callPackage ./quick-settings-audio-panel { };
   rounded-window-corners = pkgs.callPackage ./rounded-window-corners { };
+  space-bar = pkgs.callPackage ./space-bar { };
+  user-theme = pkgs.callPackage ./user-theme { };
 }

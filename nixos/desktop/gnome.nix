@@ -44,9 +44,7 @@ in
 
         # GNOME Shell extensions
         gnomeExtensions.dash-to-panel
-        gnomeExtensions.user-themes
         gnomeExtensions.blur-my-shell
-        gnomeExtensions.space-bar
         gnomeExtensions.burn-my-windows
         gnomeExtensions.vitals
         gnomeExtensions.compiz-alike-magic-lamp-effect
@@ -58,6 +56,8 @@ in
         custom.dynamic-music-pill
         custom.quick-settings-audio-panel
         custom.rounded-window-corners
+        custom.space-bar
+        custom.user-theme
       ])
       ++ lib.optionals cfg.guake.enable [
         pkgs.custom.guake-toggle

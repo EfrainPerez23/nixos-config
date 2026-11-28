@@ -1,6 +1,6 @@
 import sys
 
-ctrl_path, pill_path, exp_path = sys.argv[1], sys.argv[2], sys.argv[3]
+ctrl_path, pill_path, exp_path, vis_path, utils_path = sys.argv[1:6]
 
 # 1) Patch src/controller.js to accept an optional panelOverride for secondary monitors
 with open(ctrl_path, "r") as f:
@@ -115,7 +115,7 @@ old_exp_hover = (
 
 new_exp_hover = (
     "            this._outsideTicks = 0;\n"
-    "            this._hoverPollId = GLib.timeout_add(GLib.PRIORITY_DEFAULT, 150, () => {\n"
+    "            this._hoverPollId = GLib.timeout_add(GLib.PRIORITY_DEFAULT, 100, () => {\n"
     "                if (!this.visible || !this._settings.get_boolean('popup-hide-on-leave')) {\n"
     "                    this._outsideTicks = 0;\n"
     "                    return GLib.SOURCE_CONTINUE;\n"
@@ -169,10 +169,71 @@ new_cleanup = (
     "            if (this._hoverPollId) { GLib.Source.remove(this._hoverPollId); this._hoverPollId = null; }"
 )
 
+old_tick_timer = "            this._updateTimer = GLib.timeout_add(GLib.PRIORITY_DEFAULT, 100, () => {"
+new_tick_timer = "            this._updateTimer = GLib.timeout_add(GLib.PRIORITY_DEFAULT, 500, () => {"
+
+old_open_anim = "                    duration: 230,\n                    mode: Clutter.AnimationMode.EASE_OUT_EXPO,"
+new_open_anim = "                    duration: 140,\n                    mode: Clutter.AnimationMode.EASE_OUT_EXPO,"
+
+old_close_anim = "                    duration: 170,\n                    mode: Clutter.AnimationMode.EASE_OUT_CUBIC,"
+new_close_anim = "                    duration: 120,\n                    mode: Clutter.AnimationMode.EASE_OUT_CUBIC,"
+
 assert old_exp_hover in e, "Hover block not found in uiExpandedPlayer.js"
 assert old_cleanup in e, "Cleanup block not found in uiExpandedPlayer.js"
+assert old_tick_timer in e, "Tick timer block not found in uiExpandedPlayer.js"
+assert old_open_anim in e, "Open animation block not found in uiExpandedPlayer.js"
+assert old_close_anim in e, "Close animation block not found in uiExpandedPlayer.js"
 e = e.replace(old_exp_hover, new_exp_hover, 1)
 e = e.replace(old_cleanup, new_cleanup, 1)
+e = e.replace(old_tick_timer, new_tick_timer, 1)
+e = e.replace(old_open_anim, new_open_anim, 1)
+e = e.replace(old_close_anim, new_close_anim, 1)
 
 with open(exp_path, "w") as f:
     f.write(e)
+
+# 4) Patch src/visualizerEngine.js: run cava at 30 FPS / 32 bars instead of 60 FPS / 64 bars
+# to cut GNOME Shell main-thread Cairo repaint load in half on Intel iGPUs.
+with open(vis_path, "r") as f:
+    v = f.read()
+
+old_bars = "        this._fixedBarCount = 64;"
+new_bars = "        this._fixedBarCount = 32;"
+old_fps = "                      `framerate = 60\\n` +"
+new_fps = "                      `framerate = 30\\n` +"
+
+assert old_bars in v, "_fixedBarCount not found in visualizerEngine.js"
+assert old_fps in v, "framerate = 60 not found in visualizerEngine.js"
+v = v.replace(old_bars, new_bars, 1)
+v = v.replace(old_fps, new_fps, 1)
+
+with open(vis_path, "w") as f:
+    f.write(v)
+
+# 5) Patch src/utils.js: safely unpack int64/uint64 GLib.Variants without triggering GJS
+# precision warnings (INT64_MAX from Chrome/YouTube MPRIS flooding journald).
+with open(utils_path, "r") as f:
+    u = f.read()
+
+old_unpack = (
+    "    if (value instanceof GLib.Variant) {\n"
+    "        return smartUnpack(value.deep_unpack()); \n"
+    "    }"
+)
+new_unpack = (
+    "    if (value instanceof GLib.Variant) {\n"
+    "        let t = value.get_type_string();\n"
+    "        if (t === 'v') return smartUnpack(value.get_variant());\n"
+    "        if (t === 'x' || t === 't') {\n"
+    "            let n = Number(value.print(false));\n"
+    "            return (Number.isFinite(n) && Math.abs(n) <= Number.MAX_SAFE_INTEGER) ? n : 0;\n"
+    "        }\n"
+    "        return smartUnpack(value.deep_unpack());\n"
+    "    }"
+)
+
+assert old_unpack in u, "smartUnpack block not found in utils.js"
+u = u.replace(old_unpack, new_unpack, 1)
+
+with open(utils_path, "w") as f:
+    f.write(u)
