@@ -86,7 +86,7 @@
 | **App Launcher** | Vicinae (user systemd daemon) | [`home/desktop/vicinae.nix`](home/desktop/vicinae.nix) |
 | **Shell & Prompt** | Fish + Starship (Catppuccin Mocha) | [`home/terminal/fish.nix`](home/terminal/fish.nix) · [`home/terminal/starship.nix`](home/terminal/starship.nix) |
 | **CLI Suite** | `btop`, `bat`, `eza`, `fastfetch`, `cava`, `nh`, `just`, `direnv` | [`home/terminal/cli.nix`](home/terminal/cli.nix) |
-| **Apps & IDE** | Firefox, Google Chrome (GPU-aware flags), Antigravity IDE + CLI, Gradia | [`nixos/desktop/apps.nix`](nixos/desktop/apps.nix) |
+| **Apps & IDE** | Firefox, Google Chrome (GPU-aware flags), Antigravity IDE + CLI | [`nixos/desktop/apps.nix`](nixos/desktop/apps.nix) |
 | **Audio & Network** | PipeWire + `rtkit` · NetworkManager · CUPS | [`nixos/core/`](nixos/core/) |
 
 ---

@@ -1,4 +1,4 @@
-# Global GNOME keybindings (Guake, Vicinae, Gradia, volume, and per-window Alt+Tab)
+# Global GNOME keybindings (Guake, Vicinae, volume, and per-window Alt+Tab)
 
 { lib, osConfig, ... }:
 
@@ -9,7 +9,6 @@
         custom-keybindings = [
           "/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom0/"
           "/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom1/"
-          "/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom2/"
         ];
         volume-up = [ "<Control><Alt>Up" ];
         volume-down = [ "<Control><Alt>Down" ];
@@ -27,15 +26,9 @@
         name = "Toggle Vicinae";
       };
 
-      "org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom2" = {
-        binding = "Print";
-        command = "gradia --screenshot=INTERACTIVE";
-        name = "Gradia Screenshot";
-      };
-
-      # Unbind Print from GNOME's built-in screenshot UI so Gradia can handle it
+      # Use GNOME's built-in interactive screenshot UI on Print
       "org/gnome/shell/keybindings" = {
-        show-screenshot-ui = mkEmptyArray type.string;
+        show-screenshot-ui = [ "Print" ];
       };
 
       # Free Ctrl+Alt+Up/Down for volume controls and switch individual windows with Alt+Tab

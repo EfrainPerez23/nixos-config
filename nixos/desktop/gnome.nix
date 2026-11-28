@@ -39,7 +39,6 @@ in
         gnome-themes-extra
 
         # GNOME desktop utilities
-        gradia
         gnome-tweaks
         gnome-extension-manager
 
